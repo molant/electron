@@ -149,20 +149,11 @@ std::set<NativeWindowViews*> NativeWindowViews::forwarding_windows_;
 HHOOK NativeWindowViews::mouse_hook_ = NULL;
 
 void NativeWindowViews::Maximize() {
-  // Only use Maximize() when window has WS_THICKFRAME style
-  if (::GetWindowLong(GetAcceleratedWidget(), GWL_STYLE) & WS_THICKFRAME) {
-    if (IsVisible())
-      widget()->Maximize();
-    else
-      widget()->native_widget_private()->Show(ui::SHOW_STATE_MAXIMIZED,
-                                              gfx::Rect());
-    return;
-  } else {
-    restore_bounds_ = GetBounds();
-    auto display = display::Screen::GetScreen()->GetDisplayNearestWindow(
-        GetNativeWindow());
-    SetBounds(display.work_area(), false);
-  }
+  if (IsVisible())
+    widget()->Maximize();
+  else
+    widget()->native_widget_private()->Show(ui::SHOW_STATE_MAXIMIZED,
+                                            gfx::Rect());
 }
 
 bool NativeWindowViews::ExecuteWindowsCommand(int command_id) {

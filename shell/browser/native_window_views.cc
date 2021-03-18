@@ -521,36 +521,11 @@ void NativeWindowViews::Maximize() {
 #endif
 
 void NativeWindowViews::Unmaximize() {
-#if defined(OS_WIN)
-  if (!(::GetWindowLong(GetAcceleratedWidget(), GWL_STYLE) & WS_THICKFRAME)) {
-    SetBounds(restore_bounds_, false);
-    return;
-  }
-#endif
-
   widget()->Restore();
 }
 
 bool NativeWindowViews::IsMaximized() {
-  if (widget()->IsMaximized()) {
-    return true;
-  } else {
-    // For window without WS_THICKFRAME style, IsMaximized() will not correctly
-    // check the window state. This path will be used for transparent windows as
-    // well.
-#if defined(OS_WIN)
-    if (!(::GetWindowLong(GetAcceleratedWidget(), GWL_STYLE) & WS_THICKFRAME)) {
-      // Compare the size of the window with the size of the display
-      auto display = display::Screen::GetScreen()->GetDisplayNearestWindow(
-          GetNativeWindow());
-      // Maximized if the window is the same dimensions and placement as the
-      // display
-      return GetBounds() == display.work_area();
-    }
-#endif
-
-    return false;
-  }
+  return widget()->IsMaximized();
 }
 
 void NativeWindowViews::Minimize() {
