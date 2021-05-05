@@ -103,7 +103,8 @@
   "license": "MIT",
   "author": "Electron Community",
   "keywords": [
-    "electron"
+    "electron",
+    "electronjs"
   ],
   "husky": {
     "hooks": {
