@@ -18,7 +18,8 @@ more information see the [BrowserWindow constructor docs](browser-window.md).
 
 > Display external web content in an isolated frame and process.
 
-Process: [Renderer](../glossary.md#renderer-process)
+Process: [Renderer](../glossary.md#renderer-process)<br />
+_This class is not exported from the `'electron'` module. It is only available as a return value of other methods in the Electron API._
 
 Use the `webview` tag to embed 'guest' content (such as web pages) in your
 Electron app. The guest content is contained within the `webview` container.
@@ -506,8 +507,7 @@ Inserts `text` to the focused element.
 * `text` String - Content to be searched, must not be empty.
 * `options` Object (optional)
   * `forward` Boolean (optional) - Whether to search forward or backward, defaults to `true`.
-  * `findNext` Boolean (optional) - Whether the operation is first request or a follow up,
-    defaults to `false`.
+  * `findNext` Boolean (optional) - Whether to begin a new text finding session with this request. Should be `true` for initial requests, and `false` for follow-up requests. Defaults to `false`.
   * `matchCase` Boolean (optional) - Whether search should be case-sensitive,
     defaults to `false`.
 

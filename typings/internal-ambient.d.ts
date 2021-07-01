@@ -1,8 +1,13 @@
 /* eslint-disable no-var */
 declare var internalBinding: any;
-declare var nodeProcess: any;
-declare var isolatedWorld: any;
 declare var binding: { get: (name: string) => any; process: NodeJS.Process; createPreloadScript: (src: string) => Function };
+
+declare var isolatedApi: {
+  guestViewInternal: any;
+  allowGuestViewElementDefinition: NodeJS.InternalWebFrame['allowGuestViewElementDefinition'];
+  setIsWebView: (iframe: HTMLIFrameElement) => void;
+  createNativeImage: typeof Electron.nativeImage['createEmpty'];
+}
 
 declare const BUILDFLAG: (flag: boolean) => boolean;
 
@@ -30,7 +35,7 @@ declare namespace NodeJS {
     send(internal: boolean, channel: string, args: any[]): void;
     sendSync(internal: boolean, channel: string, args: any[]): any;
     sendToHost(channel: string, args: any[]): void;
-    sendTo(internal: boolean, webContentsId: number, channel: string, args: any[]): void;
+    sendTo(webContentsId: number, channel: string, args: any[]): void;
     invoke<T>(internal: boolean, channel: string, args: any[]): Promise<{ error: string, result: T }>;
     postMessage(channel: string, message: any, transferables: MessagePort[]): void;
   }
@@ -115,6 +120,8 @@ declare namespace NodeJS {
 
   interface InternalWebFrame extends Electron.WebFrame {
     getWebPreference<K extends keyof InternalWebPreferences>(name: K): InternalWebPreferences[K];
+    getWebFrameId(window: Window): number;
+    allowGuestViewElementDefinition(context: object, callback: Function): void;
   }
 
   interface WebFrameBinding {

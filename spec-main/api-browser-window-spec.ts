@@ -406,8 +406,7 @@ describe('BrowserWindow module', () => {
       await expect(p).to.eventually.be.fulfilled;
     });
 
-    // FIXME(robo/nornagon): re-enable these once service workers work
-    describe.skip('POST navigations', () => {
+    describe('POST navigations', () => {
       afterEach(() => { w.webContents.session.webRequest.onBeforeSendHeaders(null); });
 
       it('supports specifying POST data', async () => {
@@ -772,8 +771,10 @@ describe('BrowserWindow module', () => {
         expect(otherWindow.isFocused()).to.equal(true);
 
         const wFocused = emittedOnce(w, 'focus');
+        const otherWindowBlurred = emittedOnce(otherWindow, 'blur');
         w.focus();
         await wFocused;
+        await otherWindowBlurred;
         expect(w.isFocused()).to.equal(true);
 
         otherWindow.moveTop();
@@ -1429,13 +1430,10 @@ describe('BrowserWindow module', () => {
   describe('BrowserWindow.setAlwaysOnTop(flag, level)', () => {
     let w = null as unknown as BrowserWindow;
 
+    afterEach(closeAllWindows);
+
     beforeEach(() => {
       w = new BrowserWindow({ show: true });
-    });
-
-    afterEach(async () => {
-      await closeWindow(w);
-      w = null as unknown as BrowserWindow;
     });
 
     it('sets the window as always on top', () => {
@@ -1464,6 +1462,16 @@ describe('BrowserWindow module', () => {
       w.setAlwaysOnTop(true);
       const [, alwaysOnTop] = await alwaysOnTopChanged;
       expect(alwaysOnTop).to.be.true('is not alwaysOnTop');
+    });
+
+    ifit(process.platform === 'darwin')('honors the alwaysOnTop level of a child window', () => {
+      w = new BrowserWindow({ show: false });
+      const c = new BrowserWindow({ parent: w });
+      c.setAlwaysOnTop(true, 'screen-saver');
+
+      expect(w.isAlwaysOnTop()).to.be.false();
+      expect(c.isAlwaysOnTop()).to.be.true('child is not always on top');
+      expect((c as any)._getAlwaysOnTopLevel()).to.equal('screen-saver');
     });
   });
 
@@ -1606,6 +1614,13 @@ describe('BrowserWindow module', () => {
         w.setVibrancy(null);
         w.setVibrancy('ultra-dark');
         w.setVibrancy('' as any);
+      }).to.not.throw();
+    });
+
+    it('does not crash if vibrancy is set to an invalid value', () => {
+      const w = new BrowserWindow({ show: false });
+      expect(() => {
+        w.setVibrancy('i-am-not-a-valid-vibrancy-type' as any);
       }).to.not.throw();
     });
   });
